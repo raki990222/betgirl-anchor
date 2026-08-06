@@ -1,1 +1,0 @@
-{"at": "2026-08-06T14:12:54+09:00", "bets": {"last_seq": 2, "rows": 2, "tip": "030a9e8c5c5bcebc2d15a98547afb427b257eebfa8ef55b822bcd7b8bd16c944"}, "prev_anchor_sha256": null, "settlements": {"last_seq": 2, "rows": 2, "tip": "57d8b54b416cef83c9099f61fe2c99f92af3d3d13f2eac0a1825105e171ef07a"}}
