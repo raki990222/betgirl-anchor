@@ -1,0 +1,43 @@
+# betgirl 체인 앵커링 — 맥북이 꺼져 있어도 무결성 지문이 매일 게시된다.
+# 시크릿 불필요: 읽기=공개 anon 키, 푸시=이 레포의 GITHUB_TOKEN(contents: write).
+
+name: anchor
+
+on:
+  schedule:
+    # KST 12:20 / 16:20 / 20:20 / 00:20 (UTC 03:20 / 07:20 / 11:20 / 15:20)
+    - cron: "20 3,7,11,15 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: anchor
+  cancel-in-progress: false
+
+jobs:
+  anchor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install OpenTimestamps client
+        run: pip install --quiet opentimestamps-client
+      - name: Record anchor
+        run: python scripts/cloud_anchor.py
+      - name: Commit & push
+        run: |
+          git config user.name "betgirl-anchor-bot"
+          git config user.email "bot@betgirl.site"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "변경 없음 — 커밋 생략"
+          else
+            git commit -m "anchor $(date -u +%Y-%m-%dT%H:%M:%SZ) (cloud)"
+            git pull --rebase origin main
+            git push origin main
+          fi
